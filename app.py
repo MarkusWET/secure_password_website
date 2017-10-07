@@ -42,12 +42,12 @@ def login():
     user_entered = request.form["username"]
     password_entered = request.form["password"]
 
-    user = Users.query.filter_by(username=user_entered).first_or_404()
+    user = Users.query.filter_by(username=user_entered).first()
 
-    if user.password == password_entered:
+    if user is not None and user.password == password_entered:
         return render_template("secret_page.html")
     else:
-        return render_template("error.html")
+        return render_template("index.html", error_text="User and password do not match.")
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -64,7 +64,7 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        print("REGISTERING WITH DATA: {}:{} ({})".format(username, password, password_confirmation))
+        # print("REGISTERING WITH DATA: {}:{} ({})".format(username, password, password_confirmation))
         return render_template("success.html")
     else:
         return render_template("error.html")
