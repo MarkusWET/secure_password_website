@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+
+<body>
+
+<form method="post" action="login">
+    <label>Username:</label>
+    <input id="username" name="username" type="text">
+    <label>Passwort:</label>
+    <input id="password" name="password" type="password">
+    <input type="submit"/>
+</form>
+<p>
+    <a href="{{ url_for('register') }}">Register!</a>
+</p>
+</body>
+</html>
