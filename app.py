@@ -49,7 +49,7 @@ def digest_password_md5(password):
 
 def digest_password_pbkdf2(password, algo, salt, iterations):
     derived_key = hashlib.pbkdf2_hmac(hash_name=algo,
-                                      password=str.encode(password),
+                                      password=password.encode(),
                                       salt=salt,
                                       iterations=iterations)
     return base64.b64encode(derived_key)
@@ -63,24 +63,35 @@ def index():
 @app.route("/login", methods=["POST"])
 def login():
     user = Users.query.filter_by(username=request.form["username"]).first()
+    login_success = False
+    used_algo = "[error]"
 
-    # Plaintext login
-    # if user is not None and user.password == request.form["password"]:
-
-    # MD5 login
-    # if user is not None and user.password_md5 == digest_password_md5(request.form["password"]):
-
-    # PBKDF2 login
     if user is not None:
-        password = request.form["password"]
-        salt = user.salt
-        salt_b64_bytes = base64.b64decode(salt)
-        iterations = user.iterations
-        password_challenge = digest_password_pbkdf2(password, HASH_ALGORITHM, salt_b64_bytes, iterations)
-        if user.password_pbkdf2.encode() == password_challenge:  # digest_password_pbkdf2(request.form["password"], HASH_ALGORITHM, base64.b64decode(user.salt), ITERATIONS):
-            return render_template("secret_page.html")
+        plain_pwd = request.form["password"]
+        if user.password is not None:
+            # Plaintext login
+            login_success = user.password == plain_pwd
+            used_algo = "[plaintext]"
 
-    return render_template("index.html", error_text="User and password do not match.")
+        elif user.password_md5 is not None:
+            # MD5 login
+            password_challenge_md5 = digest_password_md5(plain_pwd)
+            login_success = user.password_md5 == password_challenge_md5
+            used_algo = "[md5]"
+
+        elif user.password_pbkdf2 is not None:
+            # PBKDF2 login
+            salt = user.salt
+            salt_b64_bytes = base64.b64decode(salt)
+            iterations = user.iterations
+            password_challenge_pbkdf2 = digest_password_pbkdf2(plain_pwd, HASH_ALGORITHM, salt_b64_bytes, iterations)
+            login_success = user.password_pbkdf2.encode() == password_challenge_pbkdf2
+            used_algo = "[pbkdf2]"
+
+    if login_success:
+        return render_template("secret_page.html", used_algo=used_algo)
+    else:
+        return render_template("index.html", error_text="User and password do not match.")
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -93,23 +104,42 @@ def register():
     password_confirmation = request.form["password_confirmation"]
 
     if password == password_confirmation:
-        # Plaintext
-        # user = Users(username, password, None, None, None)
 
-        # MD5 hashed password
-        # password_digest = digest_password_md5(password)
-        # user = Users(username, None, password_digest, None, None)
+        hash_choice = request.form["hashing"]
 
-        # PBKDF2 secure hashed and salted password
-        salt = os.urandom(16)
-        salt_b64 = base64.b64encode(salt).decode()  # salt bytes --> b64 bytes --> string
+        if hash_choice == "plain":
+            user = Users(username,
+                         password=password,
+                         password_md5=None,
+                         password_pbkdf2=None,
+                         salt=None,
+                         iterations=None)
+        elif hash_choice == "md5":
+            md5_digest = digest_password_md5(password)
+            user = Users(username,
+                         password=None,
+                         password_md5=md5_digest,
+                         password_pbkdf2=None,
+                         salt=None,
+                         iterations=None)
+        elif hash_choice == "pbkdf2":
+            salt = os.urandom(16)
+            salt_b64 = base64.b64encode(salt).decode()  # salt bytes --> b64 bytes --> string
 
-        password_digest_bytes = digest_password_pbkdf2(password,
-                                                       HASH_ALGORITHM,
-                                                       salt,
-                                                       ITERATIONS)
-        digest_string = password_digest_bytes.decode()
-        user = Users(username, None, None, digest_string, salt_b64, ITERATIONS)
+            password_digest_bytes = digest_password_pbkdf2(password,
+                                                           HASH_ALGORITHM,
+                                                           salt,
+                                                           ITERATIONS)
+            pbkdf_digest = password_digest_bytes.decode()
+            user = Users(username,
+                         password=None,
+                         password_md5=None,
+                         password_pbkdf2=pbkdf_digest,
+                         salt=salt_b64,
+                         iterations=ITERATIONS)
+        else:
+            return render_template("register.html", error_text="Something went wrong.")
+
         db.session.add(user)
         db.session.commit()
 

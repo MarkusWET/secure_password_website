@@ -7,12 +7,27 @@
 <body>
 
 <form method="post" action="register">
-    <label>Username:</label>
-    <input id="username" name="username" type="text">
+    <p>
+        <label>Username:</label>
+        <input id="username" name="username" type="text">
+    <p></p>
     <label>Passwort:</label>
     <input id="password" name="password" type="password">
+    <p></p>
     <label>Passwort bestätigen:</label>
     <input id="password_confirmation" name="password_confirmation" type="password">
+    <p></p>
+    <p></p>
+    </p>
+    <fieldset>
+        <input type="radio" id="plain" name="hashing" value="plain" checked="true">
+        <label for="plain"> Plaintext</label><br>
+        <input type="radio" id="md5" name="hashing" value="md5">
+        <label for="md5"> MD5</label><br>
+        <input type="radio" id="pbkdf2" name="hashing" value="pbkdf2">
+        <label for="pbkdf2"> PBKDF2</label>
+    </fieldset>
+
     <input type="submit"/>
 </form>
 <p style="color: red">{{ error_text }}</p>
