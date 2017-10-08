@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID as pgUUID, TEXT
 import uuid
+import hashlib
 
 app = Flask(__name__)
 app.debug = True
@@ -16,7 +17,7 @@ class Users(db.Model):
     # Fields
     user_id = db.Column("user_id", pgUUID(as_uuid=True), primary_key=True, default=lambda: uuid.uuid4().hex)
     username = db.Column("username", TEXT, unique=True)
-    usernumber = db.Column("usernumber", db.Integer, primary_key=True)
+    usernumber = db.Column("usernumber", db.Integer, primary_key=True, autoincrement=True, unique=True)
     password = db.Column("password", TEXT)
     password_md5 = db.Column("password_md5", TEXT)
     password_pbkdf2 = db.Column("password_pbkdf2", TEXT)
@@ -24,12 +25,22 @@ class Users(db.Model):
     iterations = db.Column("iterations", db.Integer)
 
     # Methods
-    def __init__(self, username, password):
+    def __init__(self, username, password, password_md5, password_pbkdf2, salt):
         self.username = username
         self.password = password
+        self.password_md5 = password_md5
+        self.password_pbkdf2 = password_pbkdf2
+        self.salt = salt
 
     def __repr__(self):
         return "<User {}>".format(self.username)
+
+
+def digest_password_md5(password):
+    """takes a password and returns the md5 digest"""
+    digester = hashlib.md5()
+    digester.update(password.encode("utf-8"))
+    return digester.hexdigest()
 
 
 @app.route("/")
@@ -39,12 +50,9 @@ def index():
 
 @app.route("/login", methods=["POST"])
 def login():
-    user_entered = request.form["username"]
-    password_entered = request.form["password"]
+    user = Users.query.filter_by(username=request.form["username"]).first()
 
-    user = Users.query.filter_by(username=user_entered).first()
-
-    if user is not None and user.password == password_entered:
+    if user is not None and user.password_md5 == digest_password_md5(request.form["password"]):
         return render_template("secret_page.html")
     else:
         return render_template("index.html", error_text="User and password do not match.")
@@ -60,14 +68,14 @@ def register():
     password_confirmation = request.form["password_confirmation"]
 
     if password == password_confirmation:
-        user = Users(username, password)
+        password_digest = digest_password_md5(password)
+        user = Users(username, None, password_digest, None, None)
         db.session.add(user)
         db.session.commit()
 
-        # print("REGISTERING WITH DATA: {}:{} ({})".format(username, password, password_confirmation))
-        return render_template("success.html")
+        return render_template("index.html", response_text="Your account has been created. You can now log in.")
     else:
-        return render_template("error.html")
+        return render_template("register.html", error_text="Passwords do not match.")
 
 
 if __name__ == "__main__":
