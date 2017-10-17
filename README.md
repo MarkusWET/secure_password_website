@@ -108,8 +108,6 @@ Ziel hierbei ist es, zu zeigen, dass "normale" Hashalgorithmen sehr schnell sind
 
 ### Burpsuite
 
-
-### Genereller Ablauf
 #### Aufklärung mit Burpsuite
 1. Unter dem Tab "Proxy" sicherstellen, dass
     1. unter "Options" der Proxy Listener läuft (running ☑️)
@@ -159,3 +157,12 @@ Hydra (http://www.thc.org/thc-hydra) starting at 2017-10-08 20:27:04
 Hydra (http://www.thc.org/thc-hydra) finished at 2017-10-08 20:37:47
 
 ```
+
+##### Geschwindigkeiten beim Angriff
+Im folgenden Screenshot wird der Unterschied zwischen den verschiedenen Hash- bzw. Plaintext-Varianten ersichtlich.
+ 
+Während eine Dictionary-Attacke auf ein Plaintextpasswort ungefähr gleich schnell ist, wie ein Angriff auf ein MD5-gehashtes Passwort, so zeigt sich klar, dass PBKDF2 zu einem erheblich höheren Zeitaufwand führt. Die Plaintext und MD5-Passwörter konnten binnen 3 Minuten geknackt werden. Für die PBKDF2-gehashte Variante werden bereits 10 Minuten benötigt.
+
+_Anmerkung: bei den 33333.33 tries/min nach dem Fund des MD5-Passwortes dürfte es sich um einen statistischen Fehler/Darstellungsfehler handeln._
+
+![alt text](attack/3_attacks.png "Attacke auf Plaintext, MD5 und PBKDF2")
