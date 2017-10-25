@@ -1,6 +1,8 @@
 # Sichere Passwortspeicherung
 
-[![Build Status](https://travis-ci.org/MarkusWET/secure_password_website.svg?branch=master)](https://travis-ci.org/MarkusWET/secure_password_website)
+[![Build Status](https://travis-ci.org/MarkusWET/secure_password_website.svg?branch=master)](https://travis-ci.org/MarkusWET/secure_password_website) 
+[![Coverage Status](https://coveralls.io/repos/github/MarkusWET/secure_password_website/badge.svg)](https://coveralls.io/github/MarkusWET/secure_password_website)
+[![Maintainability](https://api.codeclimate.com/v1/badges/7a062456f37060d2ca76/maintainability)](https://codeclimate.com/github/MarkusWET/secure_password_website/maintainability)
 
 Um Passwörter sicher in Datenbanken zu speichern, haben sich über die Jahre verschiedenste Ansätze entwickelt, die mal mehr, mal weniger sicher sind. Im Rahmen dieses Projekts gehen wir auf drei verschiedene Möglichkeiten der Passwortspeicherung ein.
 1. Plaintext
