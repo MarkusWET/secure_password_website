@@ -1,0 +1,7 @@
+flask
+Flask-Testing
+django
+pbkdf2
+psycopg2
+sqlalchemy
+urllib3
