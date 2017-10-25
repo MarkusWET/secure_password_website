@@ -1,4 +1,7 @@
 # Sichere Passwortspeicherung
+
+[![Build Status](https://travis-ci.org/MarkusWET/secure_password_website.svg?branch=master)](https://travis-ci.org/MarkusWET/secure_password_website)
+
 Um Passwörter sicher in Datenbanken zu speichern, haben sich über die Jahre verschiedenste Ansätze entwickelt, die mal mehr, mal weniger sicher sind. Im Rahmen dieses Projekts gehen wir auf drei verschiedene Möglichkeiten der Passwortspeicherung ein.
 1. Plaintext
 2. Gehasht (MD5)
